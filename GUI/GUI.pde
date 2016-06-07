@@ -67,29 +67,34 @@ void draw()
     }
 }
 
-void serialEvent(Serial sport) { 
-  String inString = sport.readStringUntil('\n');
- 
-  if(inString != null){
-    inString = trim(inString);
-    fields = split(inString, ' ');
+void serialEvent(Serial sPort) {
+  try{
+    String inString = sPort.readStringUntil('\n');
+   
+    if(inString != null){
+      inString = trim(inString);
+      fields = split(inString, ' ');
+      
+      //Extract the values for the current sample
+      temperature = float(fields[0]);
+      pressure    = float(fields[1]);
+      humidity    = float(fields[2]);
     
-    //Extract the values for the current sample
-    temperature = float(fields[0]);
-    pressure = float(fields[1]);
-    humidity = float(fields[2]);
-  
-    //Shift the buffer
-    for(int i = 1; i < NrOfSamples; i++)
-      tempBuff[i-1] = tempBuff[i];    
-    for(int i = 1; i < NrOfSamples; i++)
-      presBuff[i-1] = presBuff[i];
-    for(int i = 1; i < NrOfSamples; i++)
-      humBuff[i-1] = humBuff[i];
-    
-    //Scale the new sample to fit the graph
-    tempBuff[NrOfSamples-1] = int(map(temperature, tLimL, tLimH, 0, 255));
-    presBuff[NrOfSamples-1] = int(map(pressure,    pLimL, pLimH, 0, 255));
-    humBuff[NrOfSamples-1]  = int(map(humidity,    hLimL, hLimH, 0, 255));
+      //Shift the buffer
+      for(int i = 1; i < NrOfSamples; i++)
+        tempBuff[i-1] = tempBuff[i];    
+      for(int i = 1; i < NrOfSamples; i++)
+        presBuff[i-1] = presBuff[i];
+      for(int i = 1; i < NrOfSamples; i++)
+        humBuff[i-1] = humBuff[i];
+      
+      //Scale the new sample to fit the graph
+      tempBuff[NrOfSamples-1] = int(map(temperature, tLimL, tLimH, 0, 255));
+      presBuff[NrOfSamples-1] = int(map(pressure,    pLimL, pLimH, 0, 255));
+      humBuff[NrOfSamples-1]  = int(map(humidity,    hLimL, hLimH, 0, 255));
+    }
+  }
+  catch(RuntimeException e) {
+    e.printStackTrace();
   }
 }
